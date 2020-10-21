@@ -1,11 +1,14 @@
 package com.thoughtworks.basictest.controller;
 
+import com.thoughtworks.basictest.dto.EducationDto;
 import com.thoughtworks.basictest.dto.UserDto;
+import com.thoughtworks.basictest.pojo.Education;
 import com.thoughtworks.basictest.pojo.User;
 import com.thoughtworks.basictest.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @Author: xqc
@@ -27,9 +30,20 @@ public class UserController {
        return userService.getUser(id);
     }
 
+    @GetMapping("/users/{id}/educations")
+    public List<Education> educationList(@PathVariable("id") Long id){
+         return   userService.getUserEducations(id);
+    }
+
     @PostMapping("/users")
     public Long addUser(@RequestBody  @Valid UserDto userDto){
        return userService.add(userDto);
+    }
+
+    @PostMapping("/users/{id}/educations")
+    public void  addUser(@PathVariable("id") Long id,
+                        @RequestBody  @Valid EducationDto educationDto){
+           userService.addEducation(id,educationDto);
     }
 
 }
