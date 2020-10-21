@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class User {
+
     private Long  id;
 
     private  String name;
@@ -25,4 +26,5 @@ public class User {
     private String avatar;
 
     private String description;
+
 }

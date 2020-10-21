@@ -28,8 +28,7 @@ public class UserRepository {
     }
 
     public Optional<User> getUserById(Long id){
-        Optional<User> user = users.stream().filter(item -> item.getId().equals(id)).findFirst();
-        return user;
+        return users.stream().filter(item -> item.getId().equals(id)).findFirst();
     }
 
     public void addUser(User user){
