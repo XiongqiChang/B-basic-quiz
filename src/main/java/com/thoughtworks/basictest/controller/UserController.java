@@ -5,6 +5,7 @@ import com.thoughtworks.basictest.dto.UserDto;
 import com.thoughtworks.basictest.pojo.Education;
 import com.thoughtworks.basictest.pojo.User;
 import com.thoughtworks.basictest.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -36,14 +37,15 @@ public class UserController {
     }
 
     @PostMapping("/users")
+    @ResponseStatus(HttpStatus.CREATED)
     public Long addUser(@RequestBody  @Valid UserDto userDto){
        return userService.add(userDto);
     }
 
     @PostMapping("/users/{id}/educations")
+    @ResponseStatus(HttpStatus.CREATED)
     public void  addUser(@PathVariable("id") Long id,
                         @RequestBody  @Valid EducationDto educationDto){
            userService.addEducation(id,educationDto);
     }
-
 }

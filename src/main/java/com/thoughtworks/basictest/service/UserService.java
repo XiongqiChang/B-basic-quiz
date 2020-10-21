@@ -58,21 +58,23 @@ public class UserService {
     }
 
     public List<Education> getUserEducations(Long id) {
-        userNotExist(id);
+        if (!userRepository.getUserById(id).isPresent()) {
+            userNotExist();
+        }
         return educationRepository.getEducationList().stream()
                 .filter(item -> item.getUserId().equals(id)).collect(Collectors.toList());
     }
 
     public void addEducation(Long id, EducationDto educationDto) {
         if (!userRepository.getUserById(id).isPresent()) {
-            userNotExist(id);
+               userNotExist();
         }
-        Education education = Education.builder().description(educationDto.getDescription())
+        Education education = Education.builder().description(educationDto.getDescription()).year(educationDto.getYear())
                 .title(educationDto.getTitle()).userId(id).build();
         educationRepository.addEducation(education);
     }
 
-    private void userNotExist(Long id) {
+    private void userNotExist() {
             Date date = new Date();
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSS'Z'");
             String errorDate = simpleDateFormat.format(date);

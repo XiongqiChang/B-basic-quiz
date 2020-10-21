@@ -1,5 +1,6 @@
 package com.thoughtworks.basictest.dto;
 
+import lombok.Builder;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
@@ -12,6 +13,7 @@ import javax.validation.constraints.NotNull;
  * @version: 1.0
  */
 @Data
+@Builder
 public class EducationDto {
 
     @NotNull

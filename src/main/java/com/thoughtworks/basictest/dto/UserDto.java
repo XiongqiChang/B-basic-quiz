@@ -18,8 +18,6 @@ import javax.validation.constraints.NotNull;
 public class UserDto {
 
 
-   // private Long  id;
-
     @Length(min = 1,max = 128,message = "长度不符合规范")
     @NotNull(message = "名称不能为空")
     private  String name;

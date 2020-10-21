@@ -3,8 +3,8 @@ package com.thoughtworks.basictest.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.validation.ConstraintViolationException;
 import java.text.SimpleDateFormat;
@@ -16,7 +16,7 @@ import java.util.Date;
  * @Description: com.thoughtworks.basictest.exception
  * @version: 1.0
  */
-@RestControllerAdvice
+@ControllerAdvice
 public class GlobalException {
 
     @ExceptionHandler({MethodArgumentNotValidException.class,ConstraintViolationException.class})
