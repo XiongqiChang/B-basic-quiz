@@ -16,6 +16,7 @@ import javax.validation.constraints.NotNull;
 @Builder
 public class EducationDto {
 
+    // TODO GTB-1: - 没有对year进行校验
     @NotNull
     private Long year;
 

@@ -20,7 +20,9 @@ import java.util.Date;
 public class GlobalException {
 
     @ExceptionHandler({MethodArgumentNotValidException.class,ConstraintViolationException.class})
+    // TODO GTB-4: - 未使用的参数e
     public ResponseEntity<ErrorResult> handle(Exception e){
+        // TODO GTB-4: - 一般需要明确是哪个字段不对
         String message = "参数不对";
         Date date = new Date();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSS'Z'");

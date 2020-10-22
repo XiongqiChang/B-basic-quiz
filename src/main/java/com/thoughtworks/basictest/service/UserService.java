@@ -38,8 +38,11 @@ public class UserService {
 
     public User getUser(Long id) {
         Optional<User> userById = userRepository.getUserById(id);
+        // TODO GTB-3: - 建议使用Optional的方法简化下面代码
         if (!userById.isPresent()){
+            // TODO GTB-4: - 异常建议值保留message，其它字段完全可以在处理异常的时候再生成
             Date date = new Date();
+            // TODO GTB-4: - Megic Number
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSS'Z'");
             String errorDate = simpleDateFormat.format(date);
             throw  new UserNotExistException(new ErrorResult(errorDate, HttpStatus.NOT_FOUND.value(),"not found","输入的id有误"));
@@ -58,9 +61,11 @@ public class UserService {
     }
 
     public List<Education> getUserEducations(Long id) {
+        // TODO GTB-4: - 其实连整个if结构都可以抽取到方法中
         if (!userRepository.getUserById(id).isPresent()) {
             userNotExist();
         }
+        // TODO GTB-4: - 筛选educations的逻辑建议放到Repository
         return educationRepository.getEducationList().stream()
                 .filter(item -> item.getUserId().equals(id)).collect(Collectors.toList());
     }

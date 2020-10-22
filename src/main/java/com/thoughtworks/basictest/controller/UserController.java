@@ -19,6 +19,7 @@ import java.util.List;
  */
 @RestController
 @CrossOrigin
+// TODO GTB-3: - 建议使用类级别的@RequestMapping提取路径前缀
 public class UserController {
     private final UserService userService;
 
@@ -39,12 +40,14 @@ public class UserController {
 
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
+    // TODO GTB-3: - 违反Restful实践，Post接口应返回创建成功的对象
     public Long addUser(@RequestBody  @Valid UserDto userDto){
        return userService.add(userDto);
     }
 
     @PostMapping("/users/{id}/educations")
     @ResponseStatus(HttpStatus.CREATED)
+    // TODO GTB-4: - 注意方法名
     public void  addUser(@PathVariable("id") Long id,
                         @RequestBody  @Valid EducationDto educationDto){
            userService.addEducation(id,educationDto);
