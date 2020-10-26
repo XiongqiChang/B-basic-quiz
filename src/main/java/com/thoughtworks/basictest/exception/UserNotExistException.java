@@ -11,8 +11,8 @@ import lombok.Getter;
 @Getter
 public class UserNotExistException extends  RuntimeException {
 
-    private ErrorResult errorResult;
-    public UserNotExistException(ErrorResult errorResult){
-        this.errorResult = errorResult;
+    private ErrorResponse errorResponse;
+    public UserNotExistException(ErrorResponse errorResponse){
+        this.errorResponse =  errorResponse;
     }
 }

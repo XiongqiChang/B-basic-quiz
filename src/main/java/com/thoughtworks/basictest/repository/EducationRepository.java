@@ -8,28 +8,12 @@ package com.thoughtworks.basictest.repository;
  */
 
 import com.thoughtworks.basictest.pojo.Education;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.repository.CrudRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@Repository
-public class EducationRepository {
+public interface EducationRepository extends CrudRepository<Education,Long> {
 
-    private List<Education> educationList = new ArrayList<>();
 
-    public EducationRepository(){
-        educationList.add(new Education(1L,2005L,"Eos, explicabo, nam, tenetur et ab eius deserunt aspernatur ipsum ducimus quibusdam quis voluptatibus.",
-                "Secondary school specializing in artistic"));
-        educationList.add(new Education(1L,2006L,"Eos, explicabo, nam, tenetur et ab eius deserunt aspernatur ipsum ducimus quibusdam quis voluptatibus.",
-                "Secondary school specializing in artistic"));
-    }
-
-    public List<Education> getEducationList(){
-        return educationList;
-    }
-
-    public void addEducation(Education education) {
-        educationList.add(education);
-    }
+    List<Education> findByUserId(Long id);
 }

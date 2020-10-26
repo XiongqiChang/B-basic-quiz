@@ -1,5 +1,13 @@
 package com.thoughtworks.basictest.repository;
 
+import com.thoughtworks.basictest.pojo.User;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+
+import java.util.List;
+
 /**
  * @Author: xqc
  * @Date: 2020/10/21 - 10 - 21 - 14:04
@@ -7,36 +15,11 @@ package com.thoughtworks.basictest.repository;
  * @version: 1.0
  */
 
-import com.thoughtworks.basictest.pojo.User;
-import org.springframework.stereotype.Repository;
+public interface UserRepository extends CrudRepository<User,Long> {
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+    List<User> findAll(Pageable pageable);
 
-@Repository
-public class UserRepository {
-
-    public List<User> users = new ArrayList<>();
-
-    public UserRepository(){
-
-        users.add(new User(1L,"xqc",20L,"https://i.dlpng.com/static/png/6681915_preview.png",
-                "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"));
-        users.add(new User(2L,"xqc2",21L,"https://i.dlpng.com/static/png/6681915_preview.png",
-                "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit"));
-    }
-
-    public Optional<User> getUserById(Long id){
-        return users.stream().filter(item -> item.getId().equals(id)).findFirst();
-    }
-
-    public void addUser(User user){
-        users.add(user);
-    }
-
-    public List<User> getUsers(){
-        return users;
-    }
-
+    @Query(value = "update user as u set  u.name = ?2 where id = ?1",nativeQuery = true)
+    @Modifying
+    int updateUser(Long id, String name);
 }

@@ -6,6 +6,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,24 +20,29 @@ import java.util.Date;
 @ControllerAdvice
 public class GlobalException {
 
-    @ExceptionHandler({MethodArgumentNotValidException.class,ConstraintViolationException.class})
-    // TODO GTB-4: - 未使用的参数e
-    public ResponseEntity<ErrorResult> handle(Exception e){
-        // TODO GTB-4: - 一般需要明确是哪个字段不对
-        String message = "参数不对";
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handle(MethodArgumentNotValidException e){
+        String message = e.getBindingResult().getFieldError().getDefaultMessage();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorResponse.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResult> handle(ConstraintViolationException ex){
+        String message = "";
+        for (ConstraintViolation<?> constraint : ex.getConstraintViolations()) {
+            message = constraint.getMessage();
+            break;
+        }
         Date date = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSS'Z'");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSS");
         String errorDate = simpleDateFormat.format(date);
-        ErrorResult error = new ErrorResult(errorDate,HttpStatus.BAD_REQUEST.value(),HttpStatus.BAD_REQUEST.getReasonPhrase(),message);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-    }
+        System.out.println("出错了");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResult(errorDate,HttpStatus.BAD_REQUEST.value(),HttpStatus.BAD_REQUEST.getReasonPhrase(),message));
 
+    }
     @ExceptionHandler(UserNotExistException.class)
-    public ResponseEntity<ErrorResult> handle(UserNotExistException e){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getErrorResult());
+    public ResponseEntity<ErrorResponse> handle(UserNotExistException e){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getErrorResponse());
     }
-
-
-
-
 }

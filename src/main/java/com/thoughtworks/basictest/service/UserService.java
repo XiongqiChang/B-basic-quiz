@@ -9,22 +9,23 @@ package com.thoughtworks.basictest.service;
 
 import com.thoughtworks.basictest.dto.EducationDto;
 import com.thoughtworks.basictest.dto.UserDto;
-import com.thoughtworks.basictest.exception.ErrorResult;
+import com.thoughtworks.basictest.exception.ErrorResponse;
 import com.thoughtworks.basictest.exception.UserNotExistException;
 import com.thoughtworks.basictest.pojo.Education;
 import com.thoughtworks.basictest.pojo.User;
 import com.thoughtworks.basictest.repository.EducationRepository;
 import com.thoughtworks.basictest.repository.UserRepository;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class UserService {
 
     private final UserRepository userRepository;
@@ -36,53 +37,56 @@ public class UserService {
         this.educationRepository = educationRepository;
     }
 
-    public User getUser(Long id) {
-        Optional<User> userById = userRepository.getUserById(id);
-        // TODO GTB-3: - 建议使用Optional的方法简化下面代码
-        if (!userById.isPresent()){
-            // TODO GTB-4: - 异常建议值保留message，其它字段完全可以在处理异常的时候再生成
-            Date date = new Date();
-            // TODO GTB-4: - Megic Number
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSS'Z'");
-            String errorDate = simpleDateFormat.format(date);
-            throw  new UserNotExistException(new ErrorResult(errorDate, HttpStatus.NOT_FOUND.value(),"not found","输入的id有误"));
-        }
-        return  userById.get();
+
+    public User findById(long id) {
+      return userRepository.findById(id).orElseThrow(() -> new UserNotExistException(ErrorResponse.USER_NOT_FOUND));
+
     }
 
-    public Long add(UserDto userDto) {
-
-        int size = userRepository.getUsers().size();
-
-        User user = User.builder().name(userDto.getName()).age(userDto.getAge())
-                .avatar(userDto.getAvatar()).description(userDto.getDescription()).id((long) (size + 1)).build();
-        userRepository.addUser(user);
-        return user.getId();
+    public void deleteUser(Long id) {
+        if (!userRepository.findById(id).isPresent()){
+            throw  new UserNotExistException(ErrorResponse.USER_NOT_FOUND);
+        }
+        userRepository.deleteById(id);
     }
 
-    public List<Education> getUserEducations(Long id) {
-        // TODO GTB-4: - 其实连整个if结构都可以抽取到方法中
-        if (!userRepository.getUserById(id).isPresent()) {
-            userNotExist();
+    public User saveUser(UserDto userDto) {
+        User user = User.builder().age(userDto.getAge()).name(userDto.getName()).avatar(userDto.getAvatar())
+                .description(userDto.getDescription()).build();
+        return  userRepository.save(user);
+    }
+
+    public List<User> getUserList(Integer pageIndex, Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageIndex - 1, pageSize);
+        return userRepository.findAll(pageable);
+      /* return userRepository.findAll().stream().map(item->UserDto.builder().age(item.getAge()).avatar(item.getAvatar())
+       .description(item.getDescription()).name(item.getName()).build()).collect(Collectors.toList());*/
+    }
+
+    public List<EducationDto> getUserEducation(Long id) {
+        if (!userRepository.findById(id).isPresent()){
+            throw  new UserNotExistException(ErrorResponse.USER_NOT_FOUND);
         }
-        // TODO GTB-4: - 筛选educations的逻辑建议放到Repository
-        return educationRepository.getEducationList().stream()
-                .filter(item -> item.getUserId().equals(id)).collect(Collectors.toList());
+        return educationRepository.findByUserId(id).stream().map(item-> EducationDto.builder().description(item.getDescription())
+        .title(item.getTitle()).userId(item.getUser().getId()).year(item.getYear()).build()).collect(Collectors.toList());
     }
 
     public void addEducation(Long id, EducationDto educationDto) {
-        if (!userRepository.getUserById(id).isPresent()) {
-               userNotExist();
+        Optional<User> byId = userRepository.findById(id);
+        if (!byId.isPresent()){
+            throw  new UserNotExistException(ErrorResponse.USER_NOT_FOUND);
         }
-        Education education = Education.builder().description(educationDto.getDescription()).year(educationDto.getYear())
-                .title(educationDto.getTitle()).userId(id).build();
-        educationRepository.addEducation(education);
+        Education education = Education.builder().title(educationDto.getTitle()).description(educationDto.getDescription())
+                .user(byId.get()).year(educationDto.getYear()).build();
+        educationRepository.save(education);
     }
 
-    private void userNotExist() {
-            Date date = new Date();
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:SSS'Z'");
-            String errorDate = simpleDateFormat.format(date);
-            throw  new UserNotExistException(new ErrorResult(errorDate, HttpStatus.NOT_FOUND.value(),"not found","输入的id有误"));
+    public int updateUser(Long id, String name) {
+        Optional<User> byId = userRepository.findById(id);
+        if (!byId.isPresent()){
+            throw  new UserNotExistException(ErrorResponse.USER_NOT_FOUND);
+        }
+        return  userRepository.updateUser(id,name);
+
     }
 }

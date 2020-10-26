@@ -2,7 +2,6 @@ package com.thoughtworks.basictest.controller;
 
 import com.thoughtworks.basictest.dto.EducationDto;
 import com.thoughtworks.basictest.dto.UserDto;
-import com.thoughtworks.basictest.pojo.Education;
 import com.thoughtworks.basictest.pojo.User;
 import com.thoughtworks.basictest.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -19,37 +18,58 @@ import java.util.List;
  */
 @RestController
 @CrossOrigin
-// TODO GTB-3: - 建议使用类级别的@RequestMapping提取路径前缀
+@RequestMapping("/users")
 public class UserController {
+
     private final UserService userService;
 
     public UserController(UserService userService){
         this.userService = userService;
     }
 
-
-    @GetMapping("/users/{id}")
+    @GetMapping("/{id}")
     public User getUserById(@PathVariable("id") Long id){
-       return userService.getUser(id);
+        return userService.findById(id);
     }
 
-    @GetMapping("/users/{id}/educations")
-    public List<Education> educationList(@PathVariable("id") Long id){
-         return   userService.getUserEducations(id);
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteUser(@PathVariable("id") Long id){
+        userService.deleteUser(id);
     }
 
-    @PostMapping("/users")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    // TODO GTB-3: - 违反Restful实践，Post接口应返回创建成功的对象
-    public Long addUser(@RequestBody  @Valid UserDto userDto){
-       return userService.add(userDto);
+    public User addUser(@RequestBody @Valid UserDto userDto){
+      return   userService.saveUser(userDto);
     }
 
-    @PostMapping("/users/{id}/educations")
-    @ResponseStatus(HttpStatus.CREATED)
-    // TODO GTB-4: - 注意方法名
-    public void  addUser(@PathVariable("id") Long id,
-                        @RequestBody  @Valid EducationDto educationDto){
-           userService.addEducation(id,educationDto);
+    @GetMapping()
+    public List<User> getUserList(@RequestParam Integer pageIndex,
+                                  @RequestParam Integer pageSize){
+        return userService.getUserList(pageIndex,pageSize);
     }
+
+    @GetMapping("/{id}/educations")
+    public List<EducationDto> getEducationList(@PathVariable Long id){
+        return  userService.getUserEducation(id);
+    }
+
+
+    @PostMapping("/{id}/educations")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addEducation(@PathVariable Long id, @RequestBody @Valid EducationDto educationDto){
+        userService.addEducation(id,educationDto);
+    }
+
+
+    @PatchMapping("/{id}")
+    public int updateUsername(@PathVariable("id") Long id, @RequestParam String name){
+       return userService.updateUser(id,name);
+    }
+
+
+
+
 }

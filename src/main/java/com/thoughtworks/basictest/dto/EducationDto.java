@@ -27,4 +27,6 @@ public class EducationDto {
     @NotNull
     @Length(min = 1,max = 4096)
     private String description;
+
+    private Long userId;
 }
