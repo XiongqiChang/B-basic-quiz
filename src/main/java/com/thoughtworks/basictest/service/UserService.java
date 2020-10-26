@@ -38,9 +38,16 @@ public class UserService {
     }
 
 
-    public User findById(long id) {
-      return userRepository.findById(id).orElseThrow(() -> new UserNotExistException(ErrorResponse.USER_NOT_FOUND));
+    public UserDto findById(long id) {
+     // return userRepository.findById(id).orElseThrow(() -> new UserNotExistException(ErrorResponse.USER_NOT_FOUND));
 
+        Optional<User> user = userRepository.findById(id);
+        if (!user.isPresent()){
+            throw   new UserNotExistException(ErrorResponse.USER_NOT_FOUND);
+        }
+        User userToDto = user.get();
+        return UserDto.builder().name(userToDto.getName()).description(userToDto.getDescription()).avatar(userToDto.getAvatar())
+                .age(userToDto.getAge()).userId(userToDto.getId()).build();
     }
 
     public void deleteUser(Long id) {
@@ -56,11 +63,11 @@ public class UserService {
         return  userRepository.save(user);
     }
 
-    public List<User> getUserList(Integer pageIndex, Integer pageSize) {
+    public List<UserDto> getUserList(Integer pageIndex, Integer pageSize) {
         Pageable pageable = PageRequest.of(pageIndex - 1, pageSize);
-        return userRepository.findAll(pageable);
-      /* return userRepository.findAll().stream().map(item->UserDto.builder().age(item.getAge()).avatar(item.getAvatar())
-       .description(item.getDescription()).name(item.getName()).build()).collect(Collectors.toList());*/
+       // return userRepository.findAll(pageable);
+       return userRepository.findAll(pageable).stream().map(item->UserDto.builder().age(item.getAge()).avatar(item.getAvatar())
+       .description(item.getDescription()).name(item.getName()).build()).collect(Collectors.toList());
     }
 
     public List<EducationDto> getUserEducation(Long id) {

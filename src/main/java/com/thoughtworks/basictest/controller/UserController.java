@@ -28,7 +28,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable("id") Long id){
+    public UserDto getUserById(@PathVariable("id") Long id){
         return userService.findById(id);
     }
 
@@ -46,7 +46,7 @@ public class UserController {
     }
 
     @GetMapping()
-    public List<User> getUserList(@RequestParam Integer pageIndex,
+    public List<UserDto> getUserList(@RequestParam Integer pageIndex,
                                   @RequestParam Integer pageSize){
         return userService.getUserList(pageIndex,pageSize);
     }
