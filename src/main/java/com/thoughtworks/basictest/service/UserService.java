@@ -17,6 +17,7 @@ import com.thoughtworks.basictest.repository.EducationRepository;
 import com.thoughtworks.basictest.repository.UserRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +37,6 @@ public class UserService {
         this.userRepository = userRepository;
         this.educationRepository = educationRepository;
     }
-
 
     public UserDto findById(long id) {
      // return userRepository.findById(id).orElseThrow(() -> new UserNotExistException(ErrorResponse.USER_NOT_FOUND));
@@ -64,10 +64,12 @@ public class UserService {
     }
 
     public List<UserDto> getUserList(Integer pageIndex, Integer pageSize) {
-        Pageable pageable = PageRequest.of(pageIndex - 1, pageSize);
+
+
+        Pageable pageable = PageRequest.of(pageIndex - 1, pageSize, Sort.by("name"));
        // return userRepository.findAll(pageable);
        return userRepository.findAll(pageable).stream().map(item->UserDto.builder().age(item.getAge()).avatar(item.getAvatar())
-       .description(item.getDescription()).name(item.getName()).build()).collect(Collectors.toList());
+       .description(item.getDescription()).name(item.getName()).userId(item.getId()).build()).collect(Collectors.toList());
     }
 
     public List<EducationDto> getUserEducation(Long id) {

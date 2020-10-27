@@ -1,12 +1,11 @@
 package com.thoughtworks.basictest.repository;
 
 import com.thoughtworks.basictest.pojo.User;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
-
-import java.util.List;
 
 /**
  * @Author: xqc
@@ -15,9 +14,9 @@ import java.util.List;
  * @version: 1.0
  */
 
-public interface UserRepository extends CrudRepository<User,Long> {
+public interface UserRepository extends JpaRepository<User,Long> {
 
-    List<User> findAll(Pageable pageable);
+    Page<User> findAll(Pageable pageable);
 
     @Query(value = "update user as u set  u.name = ?2 where id = ?1",nativeQuery = true)
     @Modifying

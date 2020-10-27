@@ -47,7 +47,7 @@ public class UserController {
 
     @GetMapping()
     public List<UserDto> getUserList(@RequestParam Integer pageIndex,
-                                  @RequestParam Integer pageSize){
+                                     @RequestParam Integer pageSize){
         return userService.getUserList(pageIndex,pageSize);
     }
 
@@ -56,20 +56,14 @@ public class UserController {
         return  userService.getUserEducation(id);
     }
 
-
     @PostMapping("/{id}/educations")
     @ResponseStatus(HttpStatus.CREATED)
     public void addEducation(@PathVariable Long id, @RequestBody @Valid EducationDto educationDto){
         userService.addEducation(id,educationDto);
     }
 
-
     @PatchMapping("/{id}")
-    public int updateUsername(@PathVariable("id") Long id, @RequestParam String name){
+    public int updateUsername(@PathVariable("id") Long id, @RequestParam String  name){
        return userService.updateUser(id,name);
     }
-
-
-
-
 }

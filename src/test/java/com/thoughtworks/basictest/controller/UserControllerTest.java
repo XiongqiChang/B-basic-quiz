@@ -1,5 +1,6 @@
 package com.thoughtworks.basictest.controller;
 
+import com.thoughtworks.basictest.dto.EducationDto;
 import com.thoughtworks.basictest.dto.UserDto;
 import com.thoughtworks.basictest.exception.ErrorResponse;
 import com.thoughtworks.basictest.exception.UserNotExistException;
@@ -21,12 +22,14 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(UserController.class)
@@ -41,12 +44,12 @@ class UserControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private JacksonTester<UserDto> userJson;
+    private JacksonTester<Object> userJson;
 
-    private User firstUser;
+    private UserDto firstUser;
     @BeforeEach
     void setUp() {
-        firstUser = User.builder().id(123L).age(23L).avatar("http://xxxx.com")
+        firstUser = UserDto.builder().userId(123L).age(23L).avatar("http://xxxx.com")
                 .description("这个是测试数据").name("xqc").build();
     }
 
@@ -63,6 +66,20 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name",is("xqc")));
         verify(userService).findById(123L);
+    }
+
+    @Test
+    void should_get_education_by_id() throws Exception {
+        List<EducationDto> educationDtos = new ArrayList<>();
+        educationDtos.add(EducationDto.builder().userId(1L).title("test1").description("这是测试").year(2005L).build());
+        educationDtos.add(EducationDto.builder().userId(1L).title("test2").description("这是测试2").year(2006L).build());
+        educationDtos.add(EducationDto.builder().userId(1L).title("test3").description("这是测试3").year(2007L).build());
+        when(userService.getUserEducation(1L)).thenReturn(educationDtos);
+        mockMvc.perform(get("/users/1/educations"))
+                .andExpect(jsonPath("$",hasSize(educationDtos.size())))
+                .andExpect(jsonPath("$[0].description",is("这是测试")))
+                .andExpect(jsonPath("$[1].title",is("test2")))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -90,6 +107,27 @@ class UserControllerTest {
                 .getResponse();
         assertThat(mockHttpServletResponse.getStatus()).isEqualTo(HttpStatus.CREATED.value());
         verify(userService).saveUser(userDto);
+    }
+
+    @Test
+    void should_add_education() throws Exception {
+        EducationDto educationDto = EducationDto.builder().title("这是个测试").year(2006L).description("我是在测试")
+                .userId(1L).build();
+        mockMvc.perform(post("/users/1/educations").contentType(MediaType.APPLICATION_JSON).content(userJson.write(educationDto).getJson()))
+                .andExpect(status().isCreated());
+        verify(userService,times(1)).addEducation(1L,educationDto);
+
+    }
+
+    @Test
+    void should_update_user_by_id() throws Exception {
+
+        when(userService.updateUser(1L,"zmt")).thenReturn(1);
+
+        mockMvc.perform(patch("/users/1").param("name","zmt"))
+                .andExpect(status().isOk());
+        verify(userService,times(1)).updateUser(1L,"zmt");
+
     }
     /*@Test
     void getUserById() throws Exception {

@@ -20,7 +20,6 @@ import javax.persistence.*;
 @Entity
 public class Education {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long educationId;
@@ -32,6 +31,6 @@ public class Education {
     private String description;
 
     @ManyToOne()
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id",foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User user;
 }
